@@ -1,4 +1,5 @@
 from urllib.parse import parse_qsl
+from http import cookies
 
 
 def parse(query: str) -> dict:
@@ -32,7 +33,9 @@ if __name__ == '__main__':
 
 
 def parse_cookie(query: str) -> dict:
-    return {}
+    C = cookies.SimpleCookie()
+    C.load(query)
+    return {key: C[key].value for key in C}
 
 
 if __name__ == '__main__':
@@ -40,3 +43,13 @@ if __name__ == '__main__':
     assert parse_cookie('') == {}
     assert parse_cookie('name=Dima;age=28;') == {'name': 'Dima', 'age': '28'}
     assert parse_cookie('name=Dima=User;age=28;') == {'name': 'Dima=User', 'age': '28'}
+    assert parse_cookie('name=Dima;') == {'name': 'Dima'}
+    assert parse_cookie('name=Dima;;') == {'name': 'Dima'}
+    assert parse_cookie('name=Dima;age=28;name=Dima;age=28;') == {'name': 'Dima', 'age': '28', 'name': 'Dima', 'age': '28'}
+    assert parse_cookie('name=Dima=User;age=28=28;') == {'name': 'Dima=User', 'age': '28=28'}
+    assert parse_cookie('name=Dima=28;') == {'name': 'Dima=28'}
+    assert parse_cookie('28=28') == {"28": "28"}
+    assert parse_cookie('parse_parse=cookie;age=28;') == {'parse_parse': 'cookie', 'age': '28'}
+    assert parse_cookie('parse_parse=Dima=User;age=28;') == {'parse_parse': 'Dima=User', 'age': '28'}
+    assert parse_cookie('name=Dima;age=parse_parse;') == {'name': 'Dima', 'age': 'parse_parse'}
+    assert parse_cookie('name=query=User;age=value;') == {'name': 'query=User', 'age': 'value'}
