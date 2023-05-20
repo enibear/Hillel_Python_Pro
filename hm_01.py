@@ -33,9 +33,9 @@ if __name__ == '__main__':
 
 
 def parse_cookie(query: str) -> dict:
-    C = cookies.SimpleCookie()
-    C.load(query)
-    return {key: C[key].value for key in C}
+    simple_cookie = cookies.SimpleCookie()
+    simple_cookie.load(query)
+    return {key: simple_cookie[key].value for key in simple_cookie}
 
 
 if __name__ == '__main__':
